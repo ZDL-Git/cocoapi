@@ -230,6 +230,33 @@ class COCO:
         elif type(ids) == int:
             return [self.imgs[ids]]
 
+    def showBboxAnns(self, anns):
+        """
+         Display the bbox annotations.
+         :param anns (array of object): annotations to display
+         :return: None
+         """
+        if len(anns) == 0:
+            return 0
+        if 'segmentation' not in anns[0] and 'keypoints' not in anns[0]:
+            raise Exception('datasetType not supported')
+        ax = plt.gca()
+        ax.set_autoscale_on(False)
+        polygons = []
+        color = []
+        for ann in anns:
+            c = (np.random.random((1, 3)) * 0.6 + 0.4).tolist()[0]
+
+            [bbox_x, bbox_y, bbox_w, bbox_h] = ann['bbox']
+            poly = [[bbox_x, bbox_y], [bbox_x, bbox_y + bbox_h], [bbox_x + bbox_w, bbox_y + bbox_h],
+                    [bbox_x + bbox_w, bbox_y]]
+            np_poly = np.array(poly).reshape((4, 2))
+            polygons.append(Polygon(np_poly))
+            color.append(c)
+
+        p = PatchCollection(polygons, facecolor='none', edgecolors=color, linewidths=2)
+        ax.add_collection(p)
+
     def showAnns(self, anns, draw_bbox=False):
         """
         Display the specified annotations.
